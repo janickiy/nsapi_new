@@ -2,7 +2,6 @@
 
 namespace App\Models\certificates;
 
-use Illuminate\Contracts\Validation\Validator;
 use App\Models\references\{
     Hardness,
     Customer,
@@ -114,39 +113,39 @@ class Certificate extends Model
             ->groupBy('r.id');
 
         $q->where(function ($query) {
-            if (isset($_REQUEST['number']) && $_REQUEST['number']) {
-                $query->where('certificate.number', 'ILIKE', $_REQUEST['number']);
+            if (request()->has('number')) {
+                $query->where('certificate.number', 'ILIKE', request()->input('number'));
             }
-            if (isset($_REQUEST['number_tube']) && $_REQUEST['number_tube']) {
-                $query->where('certificate.number_tube', 'ILIKE', $_REQUEST['number_tube']);
+            if (request()->has('number_tube')) {
+                $query->where('certificate.number_tube', 'ILIKE', request()->input('number_tube'));
             }
-            if (isset($_REQUEST['rfid']) && $_REQUEST['rfid']) {
-                $query->where('certificate.rfid', 'ILIKE', $_REQUEST['rfid']);
+            if (request()->has('rfid')) {
+                $query->where('certificate.rfid', 'ILIKE', request()->input('rfid'));
             }
-            if (isset($_REQUEST['outer_diameter_id']) && $_REQUEST['outer_diameter_id']) {
-                $query->where('certificate.outer_diameter_id', $_REQUEST['outer_diameter_id']);
+            if (request()->has('outer_diameter_id')) {
+                $query->where('certificate.outer_diameter_id', request()->input('outer_diameter_id'));
             }
-            if (isset($_REQUEST['created_at']) && $_REQUEST['created_at']) {
-                $query->where('certificate.created_at', $_REQUEST['created_at']);
+            if (request()->has('created_at')) {
+                $query->where('certificate.created_at', request()->input('created_at'));
             }
         });
 
-        if (isset($_REQUEST['search_string']) && $_REQUEST['search_string']) {
+        if (request()->has('search_string')) {
             $q->where(function ($query) {
-                $query->orWhere('certificate.number', 'ILIKE', $_REQUEST['search_string']);
-                $query->orWhere('certificate.number_tube', 'ILIKE', $_REQUEST['search_string']);
-                $query->orWhere('certificate.rfid', 'ILIKE', $_REQUEST['search_string']);
-                $query->orWhere('certificate.customer', 'ILIKE', $_REQUEST['search_string']);
-                $query->orWhere('certificate.product_type', 'ILIKE', $_REQUEST['search_string']);
+                $query->orWhere('certificate.number', 'ILIKE', request()->input('search_string'));
+                $query->orWhere('certificate.number_tube', 'ILIKE', request()->input('search_string'));
+                $query->orWhere('certificate.rfid', 'ILIKE', request()->input('search_string'));
+                $query->orWhere('certificate.customer', 'ILIKE', request()->input('search_string'));
+                $query->orWhere('certificate.product_type', 'ILIKE', request()->input('search_string'));
             });
         }
 
-        if (isset($_REQUEST['length_min']) && $_REQUEST['length_min']) {
-            $q->having('COALESCE(SUM(r.length), 0)', '>=', $_REQUEST['length_min']);
+        if (request()->has('length_min')) {
+            $q->having('COALESCE(SUM(r.length), 0)', '>=', request()->input('length_min'));
         }
 
-        if (isset($_REQUEST['length_max']) && $_REQUEST['length_max']) {
-            $q->having('COALESCE(SUM(r.length), 0)', '<=', $_REQUEST['length_max']);
+        if (request()->has('length_max')) {
+            $q->having('COALESCE(SUM(r.length), 0)', '<=', request()->input('length_max'));
         }
 
         return $q;

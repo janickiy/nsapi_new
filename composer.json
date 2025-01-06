@@ -9,6 +9,8 @@
         "flipbox/lumen-generator": "*",
         "laravel/lumen-framework": "^10.0",
         "phpoffice/phpspreadsheet": "^3.7",
+        "thedevsaddam/lumen-route-list": "^2.0",
+        "xaamin/lumen-validation": "^1.0",
         "yiisoft/arrays": "^3.1"
     },
     "require-dev": {

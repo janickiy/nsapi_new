@@ -16,3 +16,23 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+
+$router->group(['prefix' => 'api/v1/'], function () use ($router) {
+    // Route::apiResource('projects', CertificatesController::class);
+    $router->group(['prefix' => 'certificates'], function () use ($router) {
+        $router->post('draft', ['as' => 'api.v1.certificates.draft', 'uses' => 'CertificatesController@listDraft']);
+        $router->post('published', ['as' => 'api.v1.certificates.published', 'uses' => 'CertificatesController@listPublished']);
+        $router->post('deleted', ['as' => 'api.v1.certificates.deleted', 'uses' => 'CertificatesController@listDeleted']);
+        $router->post('approve', ['as' => 'api.v1.certificates.approve', 'uses' => 'CertificatesController@listApprove']);
+        //listApprove
+    });
+
+
+  //  $router->get('projects', 'ProjectController@index');
+  //  $router->post('projects', 'ProjectController@store');
+  //  $router->get('projects/{id}', 'ProjectController@show');
+  //  $router->patch('projects/{id}', 'ProjectController@update');
+  //  $router->delete('projects/{id}', 'ProjectController@destroy');
+});
+
