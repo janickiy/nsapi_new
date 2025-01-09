@@ -115,6 +115,40 @@ class CertificatesController extends Controller
     }
 
     /**
+     * Восстановление в черновики
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function restore(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->restore();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Возврат на доработку
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function refund(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->refund();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * @param Request $request
      * @param array $status
      * @return JsonResponse
