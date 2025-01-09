@@ -14,7 +14,7 @@ class ListRequest extends BaseRequest
     protected function rules(): array
     {
         return [
-            'outer_diameter_id' => 'integer|exists:outer_diameter,id',
+            'outer_diameter_id' => 'integer|exists:pgsql.references.outer_diameter,id',
             'length_min' => 'numeric',
             'length_max' => 'numeric',
             'per-page' => 'integer',

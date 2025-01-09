@@ -489,49 +489,31 @@ class Certificate extends Model
      * @return void
      * @throws \Exception
      */
-    public function saveCommon(array $data)
+
+    /**
+     * @param object|null $data
+     * @return void
+     */
+    public function saveCommon(?object $data): void
     {
-        $rules = [
-            'number' => 'required',
-            'number_tube' => 'required',
-            'standard_id' => 'integer',
-            'hardness_id' => 'integer',
-            'outer_diameter_id' => 'integer',
-            'length_geophysical_cable' => 'integer',
-        ];
-
-        StringHelper::validate($data, $rules);
-
-        $standard = Standard::find(intval($data['standard_id']));
-
-        if (!$standard) throw new \Exception('Нет стандарта с таким standard_id!', 404);
-
-        $hardness = Hardness::find(intval($data['hardness_id']));
-
-        if (!$hardness) throw new \Exception('Нет группа прочности с таким hardness_id!', 404);
-
-        $outerDiameter = OuterDiameter::find(intval($data['outer_diameter_id']));
-
-        if (!$outerDiameter) throw new \Exception('Нет внешний диаметр с таким outer_diameter_id!', 404);
-
-        $this->number = $data['number'];
-        $this->number_tube = $data['number_tube'];
-        $this->rfid = $data['rfid'];
-        $this->created_at = $data['created_at'];
-        $this->product_type = $data['product_type'];
-        $this->standard_id = $data['standard_id'];
-        $this->hardness_id = $data['hardness_id'];
-        $this->outer_diameter_id = $data['outer_diameter_id'];
-        $this->agreement_delivery = $data['agreement_delivery'];
-        $this->type_heat_treatment = $data['type_heat_treatment'];
-        $this->type_quick_connection = $data['type_quick_connection'];
-        $this->type_quick_connection_note = $data['type_quick_connection_note'];
-        $this->result_hydrostatic_test = $data['result_hydrostatic_test'];
-        $this->brand_geophysical_cable = $data['brand_geophysical_cable'];
-        $this->brand_geophysical_cable_note = $data['brand_geophysical_cable_note'];
-        $this->length_geophysical_cable = $data['length_geophysical_cable'];
-        $this->length_geophysical_cable_note = $data['length_geophysical_cable_note'];
-        $this->customer = $data['customer'];
+        $this->number = $data->input('number');
+        $this->number_tube = $data->input('number_tube');
+        $this->rfid = $data->input('rfid');
+        $this->created_at = $data->input('created_at');
+        $this->product_type = $data->input('product_type');
+        $this->standard_id = $data->input('standard_id');
+        $this->hardness_id = $data->input('hardness_id');
+        $this->outer_diameter_id = $data->input('outer_diameter_id');
+        $this->agreement_delivery = $data->input('agreement_delivery');
+        $this->type_heat_treatment = $data->input('type_heat_treatment');
+        $this->type_quick_connection = $data->input('type_quick_connection');
+        $this->type_quick_connection_note = $data->input('type_quick_connection_note');
+        $this->result_hydrostatic_test = $data->input('result_hydrostatic_test');
+        $this->brand_geophysical_cable = $data->input('brand_geophysical_cable');
+        $this->brand_geophysical_cable_note = $data->input('brand_geophysical_cable_note');
+        $this->length_geophysical_cable = $data->input('length_geophysical_cable');
+        $this->length_geophysical_cable_note = $data->input('length_geophysical_cable_note');
+        $this->customer = $data->input('customer');
         $this->save();
 
         if ($this->customer) {

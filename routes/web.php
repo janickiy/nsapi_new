@@ -25,6 +25,13 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->post('published', ['as' => 'api.v1.certificates.published', 'uses' => 'CertificatesController@listPublished']);
         $router->post('deleted', ['as' => 'api.v1.certificates.deleted', 'uses' => 'CertificatesController@listDeleted']);
         $router->post('approve', ['as' => 'api.v1.certificates.approve', 'uses' => 'CertificatesController@listApprove']);
+        $router->post('create', ['as' => 'api.v1.certificates.create', 'uses' => 'CertificatesController@create']);
+
+        $router->put('update-common-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.update_common_step', 'uses' => 'CertificatesController@updateCommonStep']);
+
+        $router->delete('delete/{id:[0-9]+}', ['as' => 'api.v1.certificates.delete', 'uses' => 'CertificatesController@delete']);
+
+
         //listApprove
     });
 

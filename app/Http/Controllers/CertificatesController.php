@@ -6,6 +6,7 @@ use App\Models\Certificates\Certificate;
 use App\Models\certificates\Status;
 use App\Http\Requests\Certificates\ListRequest;
 use App\Http\Requests\Certificates\CreateRequest;
+use App\Http\Requests\Certificates\UpdateCommonStepRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -78,6 +79,39 @@ class CertificatesController extends Controller
         $certificate = Certificate::create(array_merge($request->all(), ['status_id' => Status::STATUS_DRAFT, 'created_at' => $request->created_at]));
 
         return response()->json(['success' => true, 'id' => $certificate->id], Response::HTTP_CREATED);
+    }
+
+    /**
+     * @param int $id
+     * @param UpdateCommonStepRequest $request
+     * @return JsonResponse
+     */
+    public function updateCommonStep(int $id, UpdateCommonStepRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->saveCommon($request);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Удаление/архивирование
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function delete(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->remove();
+
+        return response()->json(['success' => true]);
     }
 
     /**
