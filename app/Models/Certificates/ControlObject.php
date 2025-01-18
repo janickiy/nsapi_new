@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\certificates;
+namespace App\Models\Certificates;
 
 use Illuminate\Database\Eloquent\Model;
 

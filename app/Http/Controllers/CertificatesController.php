@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificates\Certificate;
-use App\Models\certificates\Status;
-use App\Http\Requests\Certificates\ListRequest;
-use App\Http\Requests\Certificates\CreateRequest;
-use App\Http\Requests\Certificates\UpdateCommonStepRequest;
+use App\Models\Certificates\Status;
+use App\Services\Generate\CertificateGenerateService;
+use App\Http\Requests\Certificates\{
+    ListRequest,
+    UpdateNonDestructiveTestStepRequest,
+    CreateRequest,
+    UpdateCommonStepRequest
+};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -147,6 +151,100 @@ class CertificatesController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Скачивания файла сертификата
+     *
+     * @param int $id
+     * @return void
+     */
+    public function download(int $id)
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) abort(404);
+
+        $fileName = sprintf(
+            "certificate_%s_gnkt_%s.xls",
+            $certificate->number,
+            $certificate->number_tube
+        );
+
+        $service = new CertificateGenerateService($certificate);
+        $xls = $service->generateCertificate();
+        ob_end_clean();
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $fileName . '"');
+        $xls->save("php://output");
+    }
+
+    /**
+     * Все поля сертификата
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function allFields(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json(
+            [
+                'commonStep' => $certificate->getCertificateArray(),
+                'nonDestructiveTestsStep' => $certificate->getNonDestructiveTestsAsArray(),
+                'detailTubeStep' => $certificate->getDetailTube(),
+                'cylinderStep' => $certificate->cylinder,
+                'notesStep' => $certificate->getNotesAsArray(),
+                'signaturesStep' => $certificate->getSignaturesAsArray(),
+                'rolls' => $certificate->getRolls(),
+                'pressureTest' => $certificate->getPressureTest()
+                    ? number_format($certificate->getPressureTest(), 2)
+                    : '',
+                'theoreticalMass' => $certificate->getTheoreticalMass()
+                    ? number_format(
+                        round($certificate->getTheoreticalMass() / 1000, 3)
+                    )
+                    : ''],
+        );
+    }
+
+    /**
+     * Сохраненные поля первого шага
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function nonDestructiveTestStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json($certificate->getNonDestructiveTestsAsArray());
+    }
+
+    /**
+     * Сохранение неразрушающего контроля
+     *
+     * @param UpdateNonDestructiveTestStepRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function updateNonDestructiveTestStep(UpdateNonDestructiveTestStepRequest $request, int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $data = json_decode($request->body, true);
+
+        $certificate->saveNonDestructiveTest($data);
+
+        return response()->json(['success' => true]);
+    }
+
 
     /**
      * @param Request $request

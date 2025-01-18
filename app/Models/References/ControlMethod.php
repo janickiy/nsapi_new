@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
 use Yiisoft\Arrays\ArrayHelper;
 use Illuminate\Database\Eloquent\Model;

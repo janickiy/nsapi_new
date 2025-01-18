@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\certificates;
+namespace App\Models\Certificates;
 
-use App\Models\references\{
+use App\Models\References\{
     Hardness,
     Customer,
     NdControlMethod,

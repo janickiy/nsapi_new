@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\certificates\Certificate;
+use App\Models\Certificates\Certificate;
 
 /**
  * Испытательное давление

@@ -1,27 +1,24 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Yiisoft\Arrays\ArrayHelper;
 
 /**
- * Стандарт
+ * Толщина стенки
  *
  * @property integer $id
- * @property string $name
- * @property string $prefix
- * @property boolean $is_show_absorbed_energy
+ * @property string $name Название
+ * @property numeric $value Толщина
  */
-class Standard extends Model
+class WallThickness extends Model
 {
-    protected $table = "references.standard";
+    protected $table = "references.wall_thickness";
 
     protected $fillable = [
         'name',
-        'prefix',
-        'is_show_absorbed_energy',
+        'value'
     ];
 
     public $timestamps = false;
@@ -31,7 +28,7 @@ class Standard extends Model
      */
     public static function search(): Builder
     {
-        $q = self::query()->orderBy('name', 'DESC');
+        $q = self::query()->orderBy('value');
 
         if (isset($_REQUEST['name']) && $_REQUEST['name']) {
             $q->where('name', 'ILIKE', $_REQUEST['name']);
@@ -52,17 +49,10 @@ class Standard extends Model
             $items[] = [
                 'id' => $row->id,
                 'name' => $row->name,
+                'value' => $row->value,
             ];
         }
 
         return $items;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getAllToList(): array
-    {
-        return ArrayHelper::map(self::query()->orderBy('name')->get(), 'id', 'name');
     }
 }

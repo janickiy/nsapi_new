@@ -30,6 +30,15 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->delete('delete/{id:[0-9]+}', ['as' => 'api.v1.certificates.delete', 'uses' => 'CertificatesController@delete']);
         $router->get('restore/{id:[0-9]+}', ['as' => 'api.v1.certificates.restore', 'uses' => 'CertificatesController@restore']);
         $router->get('refund/{id:[0-9]+}', ['as' => 'api.v1.certificates.refund', 'uses' => 'CertificatesController@refund']);
+        $router->get('download/{id:[0-9]+}', ['as' => 'api.v1.certificates.download', 'uses' => 'CertificatesController@download']);
+        $router->get('all-fields/{id:[0-9]+}', ['as' => 'api.v1.certificates.all_fields', 'uses' => 'CertificatesController@allFields']);
+        $router->get('non-destructive-test-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.non_destructive_test_step', 'uses' => 'CertificatesController@nonDestructiveTestStep']);
+        $router->post('update-non-destructive-test-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.update_non_destructive_test_step', 'uses' => 'CertificatesController@updateNonDestructiveTestStep']);
+
+
+
+//updateNonDestructiveTestStep
+
         //listApprove
     });
 

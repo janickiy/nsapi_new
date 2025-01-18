@@ -1,23 +1,27 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Yiisoft\Arrays\ArrayHelper;
 
 /**
- * Группа прочности
+ * Стандарт
  *
  * @property integer $id
  * @property string $name
+ * @property string $prefix
+ * @property boolean $is_show_absorbed_energy
  */
-class Hardness extends Model
+class Standard extends Model
 {
-    protected $table = "references.hardness";
+    protected $table = "references.standard";
 
     protected $fillable = [
-        'name'
+        'name',
+        'prefix',
+        'is_show_absorbed_energy',
     ];
 
     public $timestamps = false;
@@ -27,7 +31,7 @@ class Hardness extends Model
      */
     public static function search(): Builder
     {
-        $q = self::query();
+        $q = self::query()->orderBy('name', 'DESC');
 
         if (isset($_REQUEST['name']) && $_REQUEST['name']) {
             $q->where('name', 'ILIKE', $_REQUEST['name']);

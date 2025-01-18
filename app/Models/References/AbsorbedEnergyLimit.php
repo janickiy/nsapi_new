@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
-use App\Models\certificates\Certificate;
+use App\Models\Certificates\Certificate;
 use Illuminate\Database\Eloquent\Model;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\references;
+namespace App\Models\References;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
