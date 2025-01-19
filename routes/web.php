@@ -38,8 +38,13 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->post('delete-meld', ['as' => 'api.v1.certificates.delete_meld', 'uses' => 'CertificatesController@deleteMeld']);
         $router->post('create-roll', ['as' => 'api.v1.certificates.create_roll', 'uses' => 'CertificatesController@createRoll']);
         $router->post('delete-roll', ['as' => 'api.v1.certificates.delete_roll', 'uses' => 'CertificatesController@deleteRoll']);
+        $router->post('update-detail-tube-step', ['as' => 'api.v1.certificates.update_detail_tube_step', 'uses' => 'CertificatesController@updateDetailTubeStep']);
+        $router->get('detail-tube-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.detail_tube_step', 'uses' => 'CertificatesController@detailTubeStep']);
+        $router->post('rolls-sort-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.rolls_sort_step', 'uses' => 'CertificatesController@rollsSortStep']);
+        $router->get('cylinder-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.cylinder_step', 'uses' => 'CertificatesController@cylinderStep']);
+        $router->post('cylinder-update-step', ['as' => 'api.v1.certificates.cylinder_update_step', 'uses' => 'CertificatesController@cylinderUpdateStep']);
 
-        //deleteRoll
+        //cylinderUpdateStep
         //listApprove
     });
 

@@ -377,38 +377,17 @@ class Certificate extends Model
      * Сохранение детальной информации о трубе
      *
      * @param array $data
-     * @param int $certificate_id
      * @return void
-     * @throws \Exception
      */
-    public function saveDetailTube(array $data, int $certificate_id): void
+    public function saveDetailTube(array $data): void
     {
         foreach ($data['melds'] ?? [] as $meldId => $meldData) {
             $meldData = is_array($meldData) ? $meldData : [];
             $meld = Meld::find(intval($meldId));
 
             if ($meld) {
-
-
-
-                $rules = [
-                    'sekv' => 'numeric',
-                    'chemical_c' => 'numeric',
-                    'chemical_mn' => 'numeric',
-                    'chemical_si' => 'numeric',
-                    'chemical_s' => 'numeric',
-                    'chemical_p' => 'numeric',
-                    'dirty_type_a' => 'numeric',
-                    'dirty_type_b' => 'numeric',
-                    'dirty_type_c' => 'numeric',
-                    'dirty_type_d' => 'numeric',
-                    'dirty_type_ds' => 'numeric',
-                ];
-
-                StringHelper::validate($meldData, $rules);
-
                 $meld->number = $meldData['number'] ?? null;
-                $meld->certificate_id = $certificate_id;
+                $meld->certificate_id = $this->id;
                 $meld->sekv = $meldData['sekv'] ?? null;
                 $meld->sekv_note = $meldData['sekv_note'] ?? null;
                 $meld->chemical_c = $meldData['chemical_c'] ?? null;
@@ -427,21 +406,6 @@ class Certificate extends Model
                     $roll = Roll::find(intval($rollId));
 
                     if ($roll) {
-                        $rules = [
-                            'wall_thickness_id' => 'integer',
-                            'length' => 'numeric',
-                            'grain_size' => 'numeric',
-                            'hardness_om' => 'numeric',
-                            'hardness_ssh' => 'numeric',
-                            'hardness_ztv' => 'numeric',
-                            'absorbed_energy_1' => 'numeric',
-                            'absorbed_energy_2' => 'numeric',
-                            'absorbed_energy_3' => 'numeric',
-                            'fluidity' => 'numeric',
-                        ];
-
-                        StringHelper::validate($rollData, $rules);
-
                         $roll->number = $rollData['number'] ?? null;
                         $roll->wall_thickness_id = $rollData['wall_thickness_id'] ?? null;
                         $roll->length = $rollData['length'] ?? null;

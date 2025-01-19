@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Certificates\{CreateMeldRequest,
+use App\Http\Requests\Certificates\{
+    CreateMeldRequest,
     CreateRequest,
     CreateRollRequest,
+    CylinderUpdateStepRequest,
     DeleteMeldRequest,
     ListRequest,
     UpdateCommonStepRequest,
     UpdateNonDestructiveTestStepRequest,
+    UpdateDetailTubeStepRequest,
+    UpdateRollsSortStepRequest,
     DeleteRollRequest,
 };
 use App\Models\Certificates\{Certificate, Meld, Roll, Status,};
@@ -261,7 +265,6 @@ class CertificatesController extends Controller
 
         if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
 
-
         $meld = Meld::where('certificate_id', $certificate->id)->first();
 
         if ($meld) return response()->json(['error' => 'Плавка с таким certificate_id уже есть в базе данных!'], Response::HTTP_BAD_REQUEST);
@@ -334,11 +337,116 @@ class CertificatesController extends Controller
      */
     public function deleteRoll(DeleteRollRequest $request): JsonResponse
     {
-        $roll = Roll::where('roll_id', $request->roll_id)->where('meld_id',$request->meld_id)->first();
+        $roll = Roll::where('roll_id', $request->roll_id)->where('meld_id', $request->meld_id)->first();
         $roll->delete();
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Сохранение детальной информации о трубе
+     *
+     * @param UpdateDetailTubeStepRequest $request
+     * @return JsonResponse
+     */
+    public function updateDetailTubeStep(UpdateDetailTubeStepRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+        $data = json_decode($request->body, true);
+        $certificate->saveDetailTube($data);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Детальная информация о трубе
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function detailTubeStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json($certificate->getDetailTube());
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function rollsSortStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $result = [];
+
+        foreach ($certificate->rolls as $roll) {
+            $result[] = ['id' => $roll->id, 'serial_number' => $roll->serial_number, 'number' => $roll->number];
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Обновление сортировки рулонов
+     *
+     * @param updateRollsSortStepRequest $request
+     * @return JsonResponse
+     */
+    public function updateRollsSortStep(UpdateRollsSortStepRequest $request): JsonResponse
+    {
+        try {
+            $certificate = Certificate::find($request->certificate_id);
+
+            if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+            $data = json_decode($_POST['body'], true);
+
+            Roll::updateSort($certificate, $data);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Информация о барабане
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function cylinderStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json($certificate->cylinder);
+    }
+
+    /**
+     * Сохранение информации о барабане
+     *
+     * @param CylinderUpdateStepRequest $request
+     * @return JsonResponse
+     */
+    public function cylinderUpdateStep(CylinderUpdateStepRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->saveCylinder($request->all());
+
+        return response()->json(['success' => true]);
+    }
+
 
     /**
      * @param Request $request
