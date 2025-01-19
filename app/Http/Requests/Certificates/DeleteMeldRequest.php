@@ -3,7 +3,8 @@
 namespace App\Http\Requests\Certificates;
 
 use Lumen\Validation\BaseRequest;
-class UpdateNonDestructiveTestStepRequest extends BaseRequest
+
+class DeleteMeldRequest extends BaseRequest
 {
     //  protected function authorize()
     //  {
@@ -12,7 +13,8 @@ class UpdateNonDestructiveTestStepRequest extends BaseRequest
     protected function rules(): array
     {
         return [
-            'number' => 'required|json',
+            'certificate_id' => 'required|exists:pgsql.certificates.certificate,id',
+            'meld_id' => 'required|integer|exists:pgsql.certificates.meld,id',
         ];
     }
 }

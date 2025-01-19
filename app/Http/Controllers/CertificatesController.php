@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Certificates\Certificate;
-use App\Models\Certificates\Status;
-use App\Services\Generate\CertificateGenerateService;
-use App\Http\Requests\Certificates\{
-    ListRequest,
-    UpdateNonDestructiveTestStepRequest,
+use App\Http\Requests\Certificates\{CreateMeldRequest,
     CreateRequest,
-    UpdateCommonStepRequest
+    CreateRollRequest,
+    DeleteMeldRequest,
+    ListRequest,
+    UpdateCommonStepRequest,
+    UpdateNonDestructiveTestStepRequest,
+    DeleteRollRequest,
 };
+use App\Models\Certificates\{Certificate, Meld, Roll, Status,};
+use App\Models\References\{HardnessLimit, MassFraction,};
+use App\Services\Generate\CertificateGenerateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -245,6 +248,97 @@ class CertificatesController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Добавление плавки
+     *
+     * @param CreateMeldRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function createMeld(CreateMeldRequest $request, int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+
+        $meld = Meld::where('certificate_id', $certificate->id)->first();
+
+        if ($meld) return response()->json(['error' => 'Плавка с таким certificate_id уже есть в базе данных!'], Response::HTTP_BAD_REQUEST);
+
+        $meldId = Meld::create(array_merge($request->all(), ['certificate_id' => $certificate->id]))->id;
+        $massFraction = MassFraction::findByCertificate($certificate);
+
+        $data = [
+            'id' => $meldId,
+            'chemical_c_max' => $massFraction?->carbon,
+            'chemical_mn_max' => $massFraction?->manganese,
+            'chemical_si_max' => $massFraction?->silicon,
+            'chemical_s_max' => $massFraction?->sulfur,
+            'chemical_p_max' => $massFraction?->phosphorus,
+            'dirty_type_a_max' => Certificate::DIRTY_MAX,
+            'dirty_type_b_max' => Certificate::DIRTY_MAX,
+            'dirty_type_c_max' => Certificate::DIRTY_MAX,
+            'dirty_type_d_max' => Certificate::DIRTY_MAX,
+            'dirty_type_ds_max' => Certificate::DIRTY_MAX,
+        ];
+
+        return response()->json($data);
+    }
+
+    /**
+     * Удаление плавки
+     *
+     * @param DeleteMeldRequest $request
+     * @return JsonResponse
+     */
+    public function deleteMeld(DeleteMeldRequest $request): JsonResponse
+    {
+        $meld = Meld::where('id', $request->meld_id)->where('certificate_id', $request->certificate_id)->first();
+        $meld->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Добавление рулона
+     *
+     * @param CreateRollRequest $request
+     * @return JsonResponse
+     */
+    public function createRoll(CreateRollRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        $meld = Meld::where('id', $request->meld_id)->where('certificate_id', $request->certificate_id)->first();
+        $roll = Roll::create(array_merge($request->all(), ['meld_id' => $meld->id]));
+        $hardnessLimit = HardnessLimit::findByCertificate($certificate);
+
+        $data = [
+            'id' => $roll->id,
+            'serial_number' => $roll->serial_number,
+            'grain_size_max' => Certificate::GRAIN_MAX,
+            'hardness_om_max' => $hardnessLimit?->value,
+            'hardness_ssh_max' => $hardnessLimit?->value,
+            'hardness_ztv_max' => $hardnessLimit?->value,
+        ];
+
+        return response()->json($data);
+    }
+
+    /**
+     * Удаление рулона
+     *
+     * @param DeleteRollRequest $request
+     * @return JsonResponse
+     */
+    public function deleteRoll(DeleteRollRequest $request): JsonResponse
+    {
+        $roll = Roll::where('roll_id', $request->roll_id)->where('meld_id',$request->meld_id)->first();
+        $roll->delete();
+
+        return response()->json(['success' => true]);
+    }
 
     /**
      * @param Request $request

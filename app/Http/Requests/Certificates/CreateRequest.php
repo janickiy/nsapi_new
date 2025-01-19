@@ -15,11 +15,11 @@ class CreateRequest extends BaseRequest
     {
         return [
             "number" => "required|string",
-            "number_tube" => "required|string|unique:certificate,number_tube",
-            "rfid" => "string|string|unique:certificate,rfid",
-            "standard_id" => 'required|integer|exists:standard,id',
-            "hardness_id" => 'required|integer|exists:hardness,id',
-            "outer_diameter_id" => 'required|integer|exists:outer_diameter,id',
+            "number_tube" => "required|string|unique:pgsql.certificates.certificate,number_tube",
+            "rfid" => "string|string|unique:pgsql.certificates.certificate,rfid",
+            "standard_id" => 'required|integer|exists:pgsql.references.standard,id',
+            "hardness_id" => 'required|integer|exists:pgsql.references.hardness,id',
+            "outer_diameter_id" => 'required|integer|exists:pgsql.references.outer_diameter,id',
             "gnkt_wall_depth" => 'numeric',
             'created_at' => "required",
         ];

@@ -34,11 +34,12 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('all-fields/{id:[0-9]+}', ['as' => 'api.v1.certificates.all_fields', 'uses' => 'CertificatesController@allFields']);
         $router->get('non-destructive-test-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.non_destructive_test_step', 'uses' => 'CertificatesController@nonDestructiveTestStep']);
         $router->post('update-non-destructive-test-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.update_non_destructive_test_step', 'uses' => 'CertificatesController@updateNonDestructiveTestStep']);
+        $router->post('create-meld/{id:[0-9]+}', ['as' => 'api.v1.certificates.create_meld', 'uses' => 'CertificatesController@createMeld']);
+        $router->post('delete-meld', ['as' => 'api.v1.certificates.delete_meld', 'uses' => 'CertificatesController@deleteMeld']);
+        $router->post('create-roll', ['as' => 'api.v1.certificates.create_roll', 'uses' => 'CertificatesController@createRoll']);
+        $router->post('delete-roll', ['as' => 'api.v1.certificates.delete_roll', 'uses' => 'CertificatesController@deleteRoll']);
 
-
-
-//updateNonDestructiveTestStep
-
+        //deleteRoll
         //listApprove
     });
 
