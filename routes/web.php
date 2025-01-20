@@ -43,8 +43,13 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->post('rolls-sort-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.rolls_sort_step', 'uses' => 'CertificatesController@rollsSortStep']);
         $router->get('cylinder-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.cylinder_step', 'uses' => 'CertificatesController@cylinderStep']);
         $router->post('cylinder-update-step', ['as' => 'api.v1.certificates.cylinder_update_step', 'uses' => 'CertificatesController@cylinderUpdateStep']);
+        $router->post('create-note', ['as' => 'api.v1.certificates.create_note', 'uses' => 'CertificatesController@createNote']);
+        $router->post('delete-note', ['as' => 'api.v1.certificates.delete_note', 'uses' => 'CertificatesController@deleteNote']);
+        $router->get('note-step', ['as' => 'api.v1.certificates.note_step', 'uses' => 'CertificatesController@noteStep']);
+        $router->post('create-signature', ['as' => 'api.v1.certificates.create_signature', 'uses' => 'CertificatesController@createSignature']);
+        $router->post('delete-signature', ['as' => 'api.v1.certificates.delete_signature', 'uses' => 'CertificatesController@deleteSignature']);
 
-        //cylinderUpdateStep
+        //deleteSignature
         //listApprove
     });
 

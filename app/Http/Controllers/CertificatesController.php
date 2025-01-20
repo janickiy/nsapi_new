@@ -13,9 +13,20 @@ use App\Http\Requests\Certificates\{
     UpdateNonDestructiveTestStepRequest,
     UpdateDetailTubeStepRequest,
     UpdateRollsSortStepRequest,
+    CreateNoteRequest,
+    CreateSignatureRequest,
+    DeleteSignatureRequest,
+    DeleteNoteRequest,
     DeleteRollRequest,
 };
-use App\Models\Certificates\{Certificate, Meld, Roll, Status,};
+use App\Models\Certificates\{
+    Certificate,
+    Meld,
+    Roll,
+    Status,
+    Note,
+    Signature
+};
 use App\Models\References\{HardnessLimit, MassFraction,};
 use App\Services\Generate\CertificateGenerateService;
 use Illuminate\Http\JsonResponse;
@@ -443,6 +454,108 @@ class CertificatesController extends Controller
         if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
 
         $certificate->saveCylinder($request->all());
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Добавление примечания
+     *
+     * @param CreateNoteRequest $request
+     * @return JsonResponse
+     */
+    public function createNote(CreateNoteRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $note = Note::create($request->all());
+
+        return response()->json(['success' => true, 'id' => $note->id]);
+    }
+
+    /**
+     * Удаление примечания
+     *
+     * @param DeleteNoteRequest $request
+     * @return JsonResponse
+     */
+    public function deleteNote(DeleteNoteRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $note = Note::where('id', $request->node_id)
+            ->where('certificate_id', $certificate->certificate_id)
+            ->first();
+
+        if (!$note) {
+            return response()->json(['error' => 'Примечание не нейдено!'], Response::HTTP_NOT_FOUND);
+        }
+
+        $note->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Примечания
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function noteStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json($certificate->getNotesAsArray());
+    }
+
+    /**
+     * Добавление подписи
+     *
+     * @param CreateSignatureRequest $request
+     * @return JsonResponse
+     */
+    public function createSignature(CreateSignatureRequest $request): JsonResponse
+    {
+        $data = json_decode($request->body, true);
+
+        foreach ($data ?? [] as $row) {
+            Signature::create([
+                'certificate_id' => $row['certificate_id'],
+                'name' => $row['name'],
+                'position' => $row['position'],
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Удаление подписи
+     *
+     * @param DeleteSignatureRequest $request
+     * @return JsonResponse
+     */
+    public function deleteSignature(DeleteSignatureRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+
+        $signature = Signature::where('id', $request->signature_id)->where('certificate_id', $certificate->id)->first();
+
+        if (!$signature) {
+            return response()->json(['error' => 'Подпись не найдена!'], Response::HTTP_NOT_FOUND);
+        }
+
+        $signature->delete();
 
         return response()->json(['success' => true]);
     }
