@@ -2,6 +2,7 @@
 
 namespace App\Models\Certificates;
 
+use App\Models\References\WallThickness;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

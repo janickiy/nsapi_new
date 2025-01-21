@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $name ФИО
  * @property string $position Должность
  *
- * @property-read Certificates $certificate
+ * @property-read Certificate $certificate
  */
 class Signature extends Model
 {

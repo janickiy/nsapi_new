@@ -2,6 +2,7 @@
 
 namespace App\Models\Certificates;
 
+use App\Models\References\ControlMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -19,8 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Certificate $certificate
  * @property-read ControlObject $controlObject
  * @property-read ControlMethod $controlMethod
- * @property-read NdControlMethod $ndControlMethod
- * @property-read ControlResult $controlResult
  */
 class NonDestructiveTest extends Model
 {

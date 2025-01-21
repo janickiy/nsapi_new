@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Http\Response;
 
 /**
  * Сертификат
@@ -350,25 +351,17 @@ class Certificate extends Model
      */
     private function saveNonDestructiveTestItem(array $data, string $controlObjectId): void
     {
-        $rules = [
-            'control_method_id' => 'integer',
-            'nd_control_method_id' => 'integer',
-            'control_result_id' => 'integer',
-        ];
-
-        StringHelper::validate($data, $rules);
-
         $controlResult = ControlResult::find($data['control_result_id']);
 
-        if (!$controlResult) throw new \Exception('Значение control_result_id должно существовать', 404);
+        if (!$controlResult) throw new \Exception('Значение control_result_id должно существовать');
 
         $ndControlMethod = NdControlMethod::where('control_method_id', $data['control_method_id'])->first();
 
-        if (!$ndControlMethod) throw new \Exception('Значение nd_control_method_id должно существовать', 404);
+        if (!$ndControlMethod) throw new \Exception('Значение nd_control_method_id должно существовать');
 
         $controlObject = ControlObject::find($controlObjectId);
 
-        if (!$controlObject) throw new \Exception('Значение control_object_id должно существовать', 404);
+        if (!$controlObject) throw new \Exception('Значение control_object_id должно существовать');
 
         NonDestructiveTest::create(array_merge($data, ['certificate_id' => $this->id, 'control_object_id' => $controlObjectId]));
     }

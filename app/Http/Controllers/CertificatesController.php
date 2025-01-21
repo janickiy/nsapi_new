@@ -7,14 +7,18 @@ use App\Http\Requests\Certificates\{
     CreateRequest,
     CreateRollRequest,
     CylinderUpdateStepRequest,
+    CopyRequest,
     DeleteMeldRequest,
     ListRequest,
     UpdateCommonStepRequest,
     UpdateNonDestructiveTestStepRequest,
     UpdateDetailTubeStepRequest,
     UpdateRollsSortStepRequest,
+    UpdateSignatureStepRequest,
     CreateNoteRequest,
     CreateSignatureRequest,
+    WallThicknessInfoRequest,
+    CreateNonDestructiveTestRequest,
     DeleteSignatureRequest,
     DeleteNoteRequest,
     DeleteRollRequest,
@@ -25,10 +29,13 @@ use App\Models\Certificates\{
     Roll,
     Status,
     Note,
+    NonDestructiveTest,
     Signature
 };
 use App\Models\References\{HardnessLimit, MassFraction,};
 use App\Services\Generate\CertificateGenerateService;
+use App\Services\WallThicknessInfoService;
+use App\Services\CertificateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -252,15 +259,19 @@ class CertificatesController extends Controller
      */
     public function updateNonDestructiveTestStep(UpdateNonDestructiveTestStepRequest $request, int $id): JsonResponse
     {
-        $certificate = Certificate::find($id);
+        try {
+            $certificate = Certificate::find($id);
 
-        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+            if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
 
-        $data = json_decode($request->body, true);
+            $data = json_decode($request->body, true);
 
-        $certificate->saveNonDestructiveTest($data);
+            $certificate->saveNonDestructiveTest($data);
 
-        return response()->json(['success' => true]);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     /**
@@ -548,7 +559,6 @@ class CertificatesController extends Controller
 
         if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
 
-
         $signature = Signature::where('id', $request->signature_id)->where('certificate_id', $certificate->id)->first();
 
         if (!$signature) {
@@ -556,6 +566,142 @@ class CertificatesController extends Controller
         }
 
         $signature->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Подписи
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function signatureStep(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        return response()->json($certificate->getSignaturesAsArray());
+    }
+
+    /**
+     * Обновление подписей
+     *
+     * @param UpdateSignatureStepRequest $request
+     * @return JsonResponse
+     */
+    public function updateSignatureStep(UpdateSignatureStepRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $data = json_decode($request->body, true);
+        $certificate->saveSignatures($data);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Параметры толщины стенки
+     *
+     * @param WallThicknessInfoRequest $request
+     * @return JsonResponse
+     */
+    public function wallThicknessInfo(WallThicknessInfoRequest $request): JsonResponse
+    {
+        $certificate = Certificate::find($request->certificate_id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $wallThicknessInfo = new WallThicknessInfoService($certificate, $request->wallthickness_id);
+
+        return response()->json($wallThicknessInfo->fields());
+    }
+
+    /**
+     * Копирование сертификата
+     *
+     * @param CopyRequest $request
+     * @return JsonResponse
+     */
+    public function copy(CopyRequest $request): JsonResponse
+    {
+        $checkNumber = Certificate::where('number', $request->number)->first();
+
+        if ($checkNumber) return response()->json(['error' => 'Сертификат с таким number уже есть в базе данных!'], Response::HTTP_BAD_REQUEST);
+
+        $check_number_tube = Certificate::where('number_tube', $request->number_tube)->first();
+
+        if ($check_number_tube) return response()->json(['error' => 'Сертификат с таким number_tube уже есть в базе данных!'], Response::HTTP_BAD_REQUEST);
+
+        $oldCertificate = Certificate::find($request->certificate_id);
+
+        if (!$oldCertificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificateService = new CertificateService();
+        $certificate = $certificateService->copy($oldCertificate, $request->all());
+
+        return response()->json([
+            'id' => $certificate->id,
+            'success' => true
+        ]);
+    }
+
+    /**
+     * Отправка на согласование/Ввод в эксплуатацию
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function approve(int $id): JsonResponse
+    {
+        try {
+            $certificate = Certificate::find($id);
+
+            if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+            if (!$certificate->standard) return response()->json(['error' => 'Нет стандарта с таким standard_id!'], Response::HTTP_NOT_FOUND);
+            if (!$certificate->outerDiameter) return response()->json(['error' => 'Нет внешний диаметр с таким outer_diameter_id!'], Response::HTTP_NOT_FOUND);
+            if (!$certificate->hardness) return response()->json(['error' => 'Нет группа прочности с таким hardness_id!'], Response::HTTP_NOT_FOUND);
+
+            $certificateService = new CertificateService();
+            $certificateService->approve($certificate, Status::STATUS_APPROVE);
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Опубликовать сертификат
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function publish(int $id): JsonResponse
+    {
+        $certificate = Certificate::find($id);
+
+        if (!$certificate) return response()->json(['error' => 'Сертификат не найден!'], Response::HTTP_NOT_FOUND);
+
+        $certificate->status_id = Status::STATUS_PUBLISHED;
+        $certificate->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Создание неразрушающий контроля
+     *
+     * @param CreateNonDestructiveTestRequest $request
+     * @return JsonResponse
+     */
+    public function createNonDestructiveTest(CreateNonDestructiveTestRequest $request): JsonResponse
+    {
+        NonDestructiveTest::create($request->all());
 
         return response()->json(['success' => true]);
     }

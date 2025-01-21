@@ -48,8 +48,14 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('note-step', ['as' => 'api.v1.certificates.note_step', 'uses' => 'CertificatesController@noteStep']);
         $router->post('create-signature', ['as' => 'api.v1.certificates.create_signature', 'uses' => 'CertificatesController@createSignature']);
         $router->post('delete-signature', ['as' => 'api.v1.certificates.delete_signature', 'uses' => 'CertificatesController@deleteSignature']);
+        $router->get('signature-step/{id:[0-9]+}', ['as' => 'api.v1.certificates.signature_step', 'uses' => 'CertificatesController@signatureStep']);
+        $router->post('update-signature-step', ['as' => 'api.v1.certificates.update_signature_step', 'uses' => 'CertificatesController@updateSignatureStep']);
+        $router->post('copy', ['as' => 'api.v1.certificates.copy', 'uses' => 'CertificatesController@copy']);
+        $router->get('approve/{id:[0-9]+}', ['as' => 'api.v1.certificates.approve', 'uses' => 'CertificatesController@approve']);
+        $router->get('publish/{id:[0-9]+}', ['as' => 'api.v1.certificates.publish', 'uses' => 'CertificatesController@publish']);
 
-        //deleteSignature
+
+        //signatureStep
         //listApprove
     });
 
