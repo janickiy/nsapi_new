@@ -2,7 +2,6 @@
 
 namespace App\Services\Generate;
 
-
 use App\Models\Certificates\NonDestructiveTest;
 use App\Models\References\{
     FluidityLimit,

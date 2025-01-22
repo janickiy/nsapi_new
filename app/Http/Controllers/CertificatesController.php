@@ -706,7 +706,6 @@ class CertificatesController extends Controller
         return response()->json(['success' => true]);
     }
 
-
     /**
      * @param Request $request
      * @param array $status

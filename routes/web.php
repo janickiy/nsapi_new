@@ -53,17 +53,18 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->post('copy', ['as' => 'api.v1.certificates.copy', 'uses' => 'CertificatesController@copy']);
         $router->get('approve/{id:[0-9]+}', ['as' => 'api.v1.certificates.approve', 'uses' => 'CertificatesController@approve']);
         $router->get('publish/{id:[0-9]+}', ['as' => 'api.v1.certificates.publish', 'uses' => 'CertificatesController@publish']);
-
-
-        //signatureStep
-        //listApprove
     });
 
-
-  //  $router->get('projects', 'ProjectController@index');
-  //  $router->post('projects', 'ProjectController@store');
-  //  $router->get('projects/{id}', 'ProjectController@show');
-  //  $router->patch('projects/{id}', 'ProjectController@update');
-  //  $router->delete('projects/{id}', 'ProjectController@destroy');
+    $router->group(['prefix' => 'references'], function () use ($router) {
+        $router->post('standard-list', ['as' => 'api.v1.references.standard_list', 'uses' => 'ReferencesController@standardList']);
+        $router->post('hardness-list', ['as' => 'api.v1.references.hardness_list', 'uses' => 'ReferencesController@hardnessList']);
+        $router->post('outerdiameter-list', ['as' => 'api.v1.references.outerdiameter_list', 'uses' => 'ReferencesController@outerDiameterList']);
+        $router->post('customer-list', ['as' => 'api.v1.references.customer_List', 'uses' => 'ReferencesController@customerList']);
+        $router->post('control-method-list', ['as' => 'api.v1.references.control_method_list', 'uses' => 'ReferencesController@controlMethodList']);
+        $router->post('wall-thickness-list', ['as' => 'api.v1.references.wall_thickness_list', 'uses' => 'ReferencesController@wallThicknessList']);
+        $router->get('standard/{id:[0-9]+}', ['as' => 'api.v1.references.standard', 'uses' => 'ReferencesController@standard']);
+        $router->get('hardness/{id:[0-9]+}', ['as' => 'api.v1.references.hardness', 'uses' => 'ReferencesController@hardness']);
+        $router->get('outer-diameter/{id:[0-9]+}', ['as' => 'api.v1.references.outer_diameter', 'uses' => 'ReferencesController@outerDiameter']);
+    });
 });
 

@@ -69,7 +69,6 @@ class CertificateService
             }
 
             // Информация о барабане
-
             if ($oldCertificate->cylinder) {
                 Cylinder::create([
                     'id' => $certificate->id,
